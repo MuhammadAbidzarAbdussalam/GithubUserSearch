@@ -45,9 +45,11 @@ Nice-to-haves:
 Improvements made:
 - Centralized mapping between DTO/Entity/Domain.
 - Debounced search to reduce network calls.
+- Pagination support for search results.
 
 Challenges & notes:
 - Chucker not showing at Android 13+ due to platform restrictions; OkHttp logging used as fallback.
+- Hard to test ViewModels with LiveData and UseCases without a framework; kept simple.
 
 ## 3) Architecture & Rationale
 

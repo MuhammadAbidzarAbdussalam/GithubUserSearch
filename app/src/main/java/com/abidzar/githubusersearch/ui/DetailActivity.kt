@@ -3,9 +3,9 @@ package com.abidzar.githubusersearch.ui
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.abidzar.githubusersearch.R
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,9 +17,9 @@ class DetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_detail)
 
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
         val avatar: ImageView = findViewById(R.id.avatarImage)
         val username: TextView = findViewById(R.id.usernameText)
         val name: TextView = findViewById(R.id.nameText)
@@ -34,6 +34,10 @@ class DetailActivity : AppCompatActivity() {
         val publicCounts: TextView = findViewById(R.id.publicCountsText)
         val timestamps: TextView = findViewById(R.id.timestampsText)
 
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+
         val usernameArg = intent.getStringExtra(EXTRA_USERNAME) ?: return
         val avatarArg = intent.getStringExtra(EXTRA_AVATAR)
 
@@ -44,6 +48,7 @@ class DetailActivity : AppCompatActivity() {
 
         viewModel.user.observe(this) { user ->
             user?.let {
+                toolbar.title = it.username
                 username.text = it.username
                 name.text = it.name.orEmpty()
                 bio.text = it.bio.orEmpty()
