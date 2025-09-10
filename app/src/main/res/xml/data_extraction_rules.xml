@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- By default, most app data is included.
+             This section can be left empty if defaults are fine.
+             Caches and NoBackup directories are automatically excluded. -->
+        <!-- Example: Explicitly include all shared_prefs and databases -->
+        <include domain="sharedpref" path="."/>
+        <include domain="database" path="."/>
+        <!-- Files in getFilesDir() are also typically included by default -->
+        <include domain="file" path="."/>
+    </cloud-backup>
+    <device-transfer>
+        <!-- Often, device-transfer rules mirror cloud-backup unless specific differences are needed. -->
+        <include domain="sharedpref" path="."/>
+        <include domain="database" path="."/>
+        <include domain="file" path="."/>
+    </device-transfer>
+</data-extraction-rules>
