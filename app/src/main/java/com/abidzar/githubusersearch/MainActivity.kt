@@ -4,16 +4,22 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.abidzar.githubusersearch.domain.model.UserSummary
 import com.abidzar.githubusersearch.ui.DetailActivity
 import com.abidzar.githubusersearch.ui.SearchViewModel
 import com.abidzar.githubusersearch.ui.UserAdapter
+import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,30 +36,33 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        val recycler = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerView)
-        val progress = findViewById<android.widget.ProgressBar>(R.id.progressBar)
-        val stateText = findViewById<android.widget.TextView>(R.id.stateText)
-        val search = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.searchEditText)
+        val recycler = findViewById<RecyclerView>(R.id.recyclerView)
+        val progress = findViewById<ProgressBar>(R.id.progressBar)
+        val stateText = findViewById<TextView>(R.id.stateText)
+        val search = findViewById<TextInputEditText>(R.id.searchEditText)
 
         val adapter = UserAdapter { user -> openDetail(user) }
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = adapter
 
         viewModel.loading.observe(this) { loading ->
-            progress.visibility = if (loading) android.view.View.VISIBLE else android.view.View.GONE
+            if (loading) {
+                progress.visibility = View.VISIBLE
+                progress.animate()
+            } else {
+                progress.visibility = View.GONE
+                progress.clearAnimation()
+            }
         }
         viewModel.error.observe(this) { err ->
             stateText.text = err ?: ""
-            stateText.visibility = if (err != null) android.view.View.VISIBLE else android.view.View.GONE
+            stateText.visibility = if (err != null) View.VISIBLE else View.GONE
         }
-        viewModel.results.observe(this) { list ->
-            adapter.submit(list)
-            if (list.isEmpty() && (viewModel.error.value == null)) {
-                stateText.text = "No results"
-                stateText.visibility = android.view.View.VISIBLE
-            } else if (list.isNotEmpty()) {
-                stateText.visibility = android.view.View.GONE
+        viewModel.results.observe(this) { pagingData ->
+            lifecycleScope.launchWhenStarted {
+                adapter.submitData(pagingData)
             }
+            stateText.visibility = View.GONE
         }
 
         search.addTextChangedListener(object : TextWatcher {

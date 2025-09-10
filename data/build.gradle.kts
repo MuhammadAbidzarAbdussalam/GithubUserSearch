@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.retrofit.moshi)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
+    implementation(libs.androidx.paging.runtime)
 
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)

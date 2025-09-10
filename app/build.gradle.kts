@@ -70,6 +70,7 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     implementation(libs.androidx.work)
+    implementation(libs.androidx.paging.runtime)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)

@@ -5,6 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.abidzar.githubusersearch.R
 import com.abidzar.githubusersearch.domain.model.UserSummary
@@ -12,15 +14,7 @@ import com.bumptech.glide.Glide
 
 class UserAdapter(
     private val onClick: (UserSummary) -> Unit
-) : RecyclerView.Adapter<UserAdapter.VH>() {
-
-    private val items = mutableListOf<UserSummary>()
-
-    fun submit(list: List<UserSummary>) {
-        items.clear()
-        items.addAll(list)
-        notifyDataSetChanged()
-    }
+) : PagingDataAdapter<UserSummary, UserAdapter.VH>(DIFF) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_user_summary, parent, false)
@@ -28,18 +22,26 @@ class UserAdapter(
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        holder.bind(items[position], onClick)
+        getItem(position)?.let { holder.bind(it, onClick) }
     }
-
-    override fun getItemCount(): Int = items.size
 
     class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val avatar: ImageView = itemView.findViewById(R.id.avatarImage)
         private val username: TextView = itemView.findViewById(R.id.usernameText)
+
         fun bind(item: UserSummary, onClick: (UserSummary) -> Unit) {
             username.text = item.username
-            Glide.with(avatar).load(item.avatarUrl).into(avatar)
+            Glide.with(avatar).load(item.avatarUrl).circleCrop().into(avatar)
             itemView.setOnClickListener { onClick(item) }
+        }
+    }
+
+    companion object {
+        private val DIFF = object : DiffUtil.ItemCallback<UserSummary>() {
+            override fun areItemsTheSame(oldItem: UserSummary, newItem: UserSummary): Boolean =
+                oldItem.username == newItem.username
+            override fun areContentsTheSame(oldItem: UserSummary, newItem: UserSummary): Boolean =
+                oldItem == newItem
         }
     }
 }
